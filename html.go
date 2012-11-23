@@ -18,6 +18,7 @@ package blackfriday
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 )
@@ -55,12 +56,18 @@ type Html struct {
 	toc          *bytes.Buffer
 
 	smartypants *smartypantsRenderer
+
+	blockCodeProcessor BlockCodeProcessor
 }
 
 const (
 	xhtmlClose = " />\n"
 	htmlClose  = ">\n"
 )
+
+// Do some kind of transformation on a code block (generally syntax highlighting). The block passed into this
+// function will not be HTML escaped beforehand.
+type BlockCodeProcessor func(io.Writer, io.Reader, string)
 
 // HtmlRenderer creates and configures an Html object, which
 // satisfies the Renderer interface.
@@ -69,7 +76,7 @@ const (
 // title is the title of the document, and css is a URL for the document's
 // stylesheet.
 // title and css are only used when HTML_COMPLETE_PAGE is selected.
-func HtmlRenderer(flags int, title string, css string) Renderer {
+func HtmlRenderer(flags int, title string, css string) *Html {
 	// configure the rendering engine
 	closeTag := htmlClose
 	if flags&HTML_USE_XHTML != 0 {
@@ -134,6 +141,11 @@ func attrEscape(out *bytes.Buffer, src []byte) {
 	if org < len(src) {
 		out.Write(src[org:])
 	}
+}
+
+// Set a code block processor for this renderer.
+func (options *Html) SetBlockCodeProcessor(processor BlockCodeProcessor) {
+	options.blockCodeProcessor = processor
 }
 
 func (options *Html) Header(out *bytes.Buffer, text func() bool, level int) {
@@ -237,6 +249,7 @@ func (options *Html) BlockCodeGithub(out *bytes.Buffer, text []byte, lang string
 
 	// parse out the language name
 	count := 0
+	language := ""
 	for _, elt := range strings.Fields(lang) {
 		if elt[0] == '.' {
 			elt = elt[1:]
@@ -244,19 +257,25 @@ func (options *Html) BlockCodeGithub(out *bytes.Buffer, text []byte, lang string
 		if len(elt) == 0 {
 			continue
 		}
-		out.WriteString("<pre lang=\"")
-		attrEscape(out, []byte(elt))
-		out.WriteString("\"><code>")
+		var b bytes.Buffer
+		attrEscape(&b, []byte(elt))
+		language = b.String()
 		count++
 		break
 	}
 
-	if count == 0 {
-		out.WriteString("<pre><code>")
+	if options.blockCodeProcessor == nil {
+		if language == "" {
+			out.WriteString("<pre><code>")
+		} else {
+			out.WriteString("<pre lang=\"" + language + "\"><code>")
+		}
+		attrEscape(out, text)
+		out.WriteString("</code></pre>\n")
+	} else {
+		b := bytes.NewBuffer(text)
+		options.blockCodeProcessor(out, b, language)
 	}
-
-	attrEscape(out, text)
-	out.WriteString("</code></pre>\n")
 }
 
 func (options *Html) BlockQuote(out *bytes.Buffer, text []byte) {
