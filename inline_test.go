@@ -32,6 +32,10 @@ func doTestsInline(t *testing.T, tests []string) {
 	doTestsInlineParam(t, tests, 0, 0)
 }
 
+func doSafeTestsInline(t *testing.T, tests []string) {
+	doTestsInlineParam(t, tests, 0, HTML_SAFELINK)
+}
+
 func doTestsInlineParam(t *testing.T, tests []string, extensions, htmlFlags int) {
 	// catch and report panics
 	var candidate string
@@ -390,6 +394,9 @@ func TestInlineLink(t *testing.T) {
 		"[link](  with whitespace   )\n",
 		"<p><a href=\"with whitespace\">link</a></p>\n",
 
+		"[![image](someimage)](with image)\n",
+		"<p><a href=\"with image\"><img src=\"someimage\" alt=\"image\" />\n</a></p>\n",
+
 		"[link](url \"one quote)\n",
 		"<p><a href=\"url &quot;one quote\">link</a></p>\n",
 
@@ -407,8 +414,35 @@ func TestInlineLink(t *testing.T) {
 
 		"[link](/url/&query)\n",
 		"<p><a href=\"/url/&amp;query\">link</a></p>\n",
+
+		"[[t]](/t)\n",
+		"<p><a href=\"/t\">[t]</a></p>\n",
 	}
 	doTestsInline(t, tests)
+}
+
+func TestSafeInlineLink(t *testing.T) {
+	var tests = []string{
+		"[foo](/bar/)\n",
+		"<p><a href=\"/bar/\">foo</a></p>\n",
+
+		"[foo](http://bar/)\n",
+		"<p><a href=\"http://bar/\">foo</a></p>\n",
+
+		"[foo](https://bar/)\n",
+		"<p><a href=\"https://bar/\">foo</a></p>\n",
+
+		"[foo](ftp://bar/)\n",
+		"<p><a href=\"ftp://bar/\">foo</a></p>\n",
+
+		"[foo](mailto://bar/)\n",
+		"<p><a href=\"mailto://bar/\">foo</a></p>\n",
+
+		// Not considered safe
+		"[foo](baz://bar/)\n",
+		"<p><tt>foo</tt></p>\n",
+	}
+	doSafeTestsInline(t, tests)
 }
 
 func TestReferenceLink(t *testing.T) {
@@ -462,6 +496,45 @@ func TestTags(t *testing.T) {
 
 func TestAutoLink(t *testing.T) {
 	var tests = []string{
+		"http://foo.com/\n",
+		"<p><a href=\"http://foo.com/\">http://foo.com/</a></p>\n",
+
+		"1 http://foo.com/\n",
+		"<p>1 <a href=\"http://foo.com/\">http://foo.com/</a></p>\n",
+
+		"1http://foo.com/\n",
+		"<p>1<a href=\"http://foo.com/\">http://foo.com/</a></p>\n",
+
+		"1.http://foo.com/\n",
+		"<p>1.<a href=\"http://foo.com/\">http://foo.com/</a></p>\n",
+
+		"1. http://foo.com/\n",
+		"<ol>\n<li><a href=\"http://foo.com/\">http://foo.com/</a></li>\n</ol>\n",
+
+		"-http://foo.com/\n",
+		"<p>-<a href=\"http://foo.com/\">http://foo.com/</a></p>\n",
+
+		"- http://foo.com/\n",
+		"<ul>\n<li><a href=\"http://foo.com/\">http://foo.com/</a></li>\n</ul>\n",
+
+		"_http://foo.com/\n",
+		"<p>_<a href=\"http://foo.com/\">http://foo.com/</a></p>\n",
+
+		"令狐http://foo.com/\n",
+		"<p>令狐<a href=\"http://foo.com/\">http://foo.com/</a></p>\n",
+
+		"令狐 http://foo.com/\n",
+		"<p>令狐 <a href=\"http://foo.com/\">http://foo.com/</a></p>\n",
+
+		"ahttp://foo.com/\n",
+		"<p>ahttp://foo.com/</p>\n",
+
+		">http://foo.com/\n",
+		"<blockquote>\n<p><a href=\"http://foo.com/\">http://foo.com/</a></p>\n</blockquote>\n",
+
+		"> http://foo.com/\n",
+		"<blockquote>\n<p><a href=\"http://foo.com/\">http://foo.com/</a></p>\n</blockquote>\n",
+
 		"go to <http://foo.com/>\n",
 		"<p>go to <a href=\"http://foo.com/\">http://foo.com/</a></p>\n",
 

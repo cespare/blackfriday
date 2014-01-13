@@ -140,6 +140,7 @@ type Renderer interface {
 	Paragraph(out *bytes.Buffer, text func() bool)
 	Table(out *bytes.Buffer, header []byte, body []byte, columnData []int)
 	TableRow(out *bytes.Buffer, text []byte)
+	TableHeaderCell(out *bytes.Buffer, text []byte, flags int)
 	TableCell(out *bytes.Buffer, text []byte, flags int)
 	Footnotes(out *bytes.Buffer, text func() bool)
 	FootnoteItem(out *bytes.Buffer, name, text []byte, flags int)
@@ -685,10 +686,15 @@ func isspace(c byte) bool {
 	return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v'
 }
 
+// Test if a character is letter.
+func isletter(c byte) bool {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+}
+
 // Test if a character is a letter or a digit.
 // TODO: check when this is looking for ASCII alnum and when it should use unicode
 func isalnum(c byte) bool {
-	return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+	return (c >= '0' && c <= '9') || isletter(c)
 }
 
 // Replace tab characters with spaces, aligning to the next TAB_SIZE column.

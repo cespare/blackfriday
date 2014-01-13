@@ -180,8 +180,8 @@ const (
 
 // '[': parse a link or an image or a footnote
 func link(p *parser, out *bytes.Buffer, data []byte, offset int) int {
-	// no links allowed inside other links
-	if p.insideLink {
+	// no links allowed inside regular links, footnote, and deferred footnotes
+	if p.insideLink && (offset > 0 && data[offset-1] == '[' || len(data)-1 > offset && data[offset+1] == '^') {
 		return 0
 	}
 
@@ -620,7 +620,7 @@ func autoLink(p *parser, out *bytes.Buffer, data []byte, offset int) int {
 
 	// scan backward for a word boundary
 	rewind := 0
-	for offset-rewind > 0 && rewind <= 7 && !isspace(data[offset-rewind-1]) && !isspace(data[offset-rewind-1]) {
+	for offset-rewind > 0 && rewind <= 7 && isletter(data[offset-rewind-1]) {
 		rewind++
 	}
 	if rewind > 6 { // longest supported protocol is "mailto" which has 6 letters
@@ -718,7 +718,7 @@ func autoLink(p *parser, out *bytes.Buffer, data []byte, offset int) int {
 	return linkEnd - rewind
 }
 
-var validUris = [][]byte{[]byte("http://"), []byte("https://"), []byte("ftp://"), []byte("mailto://")}
+var validUris = [][]byte{[]byte("http://"), []byte("https://"), []byte("ftp://"), []byte("mailto://"), []byte("/")}
 
 func isSafeLink(link []byte) bool {
 	for _, prefix := range validUris {

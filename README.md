@@ -25,7 +25,7 @@ With Go 1 and git installed:
 
     go get github.com/russross/blackfriday
 
-will download, compile, and install the package into your `$GOROOT`
+will download, compile, and install the package into your `$GOPATH`
 directory hierarchy. Alternatively, you can import it into a
 project:
 
@@ -65,7 +65,7 @@ code:
 Note that if you have not already done so, installing
 `blackfriday-tool` will be sufficient to download and install
 blackfriday in addition to the tool itself. The tool binary will be
-installed in `$GOROOT/bin`.  This is a statically-linked binary that
+installed in `$GOPATH/bin`.  This is a statically-linked binary that
 can be copied to wherever you need it without worrying about
 dependencies and library versions.
 
@@ -92,7 +92,7 @@ All features of upskirt are supported, including:
 *   **Fast processing**. It is fast enough to render on-demand in
     most web applications without having to cache the output.
 
-*   **Thread safety**. You can run multiple parsers is different
+*   **Thread safety**. You can run multiple parsers in different
     goroutines without ill effect. There is no dependence on global
     shared state.
 
@@ -197,31 +197,33 @@ License
 
 Blackfriday is distributed under the Simplified BSD License:
 
-> Copyright © 2011 Russ Ross. All rights reserved.
+> Copyright © 2011 Russ Ross
+> All rights reserved.
 > 
-> Redistribution and use in source and binary forms, with or without modification, are
-> permitted provided that the following conditions are met:
+> Redistribution and use in source and binary forms, with or without
+> modification, are permitted provided that the following conditions
+> are met:
 > 
->    1. Redistributions of source code must retain the above copyright notice, this list of
->       conditions and the following disclaimer.
+> 1.  Redistributions of source code must retain the above copyright
+>     notice, this list of conditions and the following disclaimer.
 > 
->    2. Redistributions in binary form must reproduce the above copyright notice, this list
->       of conditions and the following disclaimer in the documentation and/or other materials
->       provided with the distribution.
+> 2.  Redistributions in binary form must reproduce the above
+>     copyright notice, this list of conditions and the following
+>     disclaimer in the documentation and/or other materials provided with
+>     the distribution.
 > 
-> THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER ``AS IS'' AND ANY EXPRESS OR IMPLIED
-> WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-> FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR
-> CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-> CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-> SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-> ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-> NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-> ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-> 
-> The views and conclusions contained in the software and documentation are those of the
-> authors and should not be interpreted as representing official policies, either expressed
-> or implied, of the copyright holder.
+> THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+> "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+> LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+> FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+> COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+> INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+> BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+> LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+> CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+> LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+> ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+> POSSIBILITY OF SUCH DAMAGE.
 
 
    [1]: http://daringfireball.net/projects/markdown/ "Markdown"
